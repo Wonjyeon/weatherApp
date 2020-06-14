@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Welcome to Vue</title>
+  <script src="https://unpkg.com/vue"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <weather></weather>
+  </div>
+
+  <script>
+    Vue.component('weather', {
+      template:`
+      <div>
+        <input v-model="city" placeholder="도시명">
+        <button v-on:click="updateWeather">확인</button>
+        <p v-for="w in weather">
+          description : {{w.description}} <br />
+          <img :src="icon_url" /> <br />
+          <img :src="map_url" />
+        </p>
+      </div>
+      `,
+      data: function() {
+        return {
+          city:'',
+          icon_url:'',
+          map_url:'',
+          weather:null,
+        }
+      },
+      methods: {
+        getIconURL: function(n) {
+          return 'https://openweathermap.org/img/w/'+n+'.png';
+        },
+        getMapURL: function(city) {
+          return 'https://maps.googleapis.com/maps/api/staticmap?center='+city+'&zoom=13&size=600x300&maptype=roadmap&key=AIzaSyATK4UcM87uptHfqHImhHTFIMxLwIsAbNs';
+        },
+        updateWeather: function() {
+          var url = 'https://api.openweathermap.org/data/2.5/weather?q='+this.city+'&appid=1792447a7964370f854923bf80522be8';
+          axios.get(url).then(res => {  
+            console.log(JSON.stringify(res.data));
+            this.weather = res.data.weather;
+            this.icon_url = this.getIconURL(this.weather[0].icon);
+            this.map_url = this.getMapURL(this.city);
+          });
+        }
+      }
+    });
+
+    var app = new Vue({
+      el:"#app"
+    });
+  </script>
+
+</body>
+</html>
